@@ -10,19 +10,9 @@ Run only in an isolated environment.
 
 ## Architecture
 
-attacker01		 app01
-   |			   |
-   v			   v
- web01			 Alloy
- Nginx			   |
-   |			   v
-   v			 Loki
- app01			   |
- Flask			   v
-   |			Grafana
-   v
- db01
-MariaDB
+attacker01 -> web01 (Nginx) -> app01 (Flask) -> db01 (MariaDB)
+
+app01 -> Alloy -> Loki -> Grafana
 
 ## Technologies
 
