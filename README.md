@@ -1,6 +1,7 @@
 # Cyberlab
 
 This is a containerized  cybersecurity lab built with Docker Compose for my own learning purposes.
+
 This includes application security, network segmentation, centralized logging and detection.
 
 ## WARNING!
@@ -17,20 +18,31 @@ app01 -> Alloy -> Loki -> Grafana
 ## Technologies
 
 Docker Compose
+
 Nginx
+
 Python / Flask
+
 MariaDB
+
 Grafana Alloy
+
 Grafana Loki
+
 Grafana
 
 ## Security Exercises
 
 SQL injection
+
 Authentication bypass
+
 Brute-force detection
+
 Network segmentation
+
 Logging
+
 Alerting
 
 ## Status
