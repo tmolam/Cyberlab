@@ -1,0 +1,70 @@
+services:
+  web01:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web01:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - frontend
+      - application
+
+  app01:
+    build: ./app01
+    networks:
+      - application
+      - logging
+
+  db01:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: labroot
+      MARIADB_DATABASE: cyberlab
+      MARIADB_USER: labuser
+      MARIADB_PASSWORD: labpass
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - application
+
+  attacker01:
+    build: ./attacker01
+    networks:
+      - frontend
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - logging
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - logging
+
+  alloy:
+    image: grafana/alloy:latest
+    command:
+      - run
+      - /etc/alloy/config.alloy
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    networks:
+      - logging
+
+networks:
+  lab:
+  frontend:
+  application:
+  logging:
+
+volumes:
+  db_data:
+  grafana_data:

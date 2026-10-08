@@ -1,0 +1,15 @@
+# Runtime data
+grafana_data/
+db_data/
+
+# Logs
+*.log
+logs/
+
+# Environment / secrets
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
