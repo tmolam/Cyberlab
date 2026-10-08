@@ -1,6 +1,7 @@
 from flask import Flask, request
 import pymysql
 import logging
+import os
 
 app = Flask(__name__)
 
@@ -8,11 +9,11 @@ logging.basicConfig(level=logging.INFO)
 
 def get_db():
 	return pymysql.connect(
-		host="db01",
+		host=os.getenv("DB_HOST"),
 		port=3306,
-		user="labuser",
-		password="labpass",
-		database="cyberlab"
+		user=os.getenv("DB_USER"),
+		password=os.getenv("DB_PASSWORD"),
+		database=os.getenv("DB_NAME"),
 	)
 
 @app.route("/")
