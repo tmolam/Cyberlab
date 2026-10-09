@@ -6,6 +6,31 @@ local.file_match "docker_logs" {
 
 loki.source.file "docker_logs" {
 	targets = local.file_match.docker_logs.targets
+	forward_to = [loki.process.docker_logs.receiver]
+}
+
+loki.process "docker_logs" {
+	stage.json {
+		expressions = {
+			log = "log",
+			stream = "stream",
+			attrs = "attrs",
+		}
+	}
+
+	stage.json {
+		source = "attrs"
+		expressions = {
+			service = "service",
+		}
+	}
+
+	stage.labels {
+		values = {
+			service = "service",
+		}
+	}
+
 	forward_to = [loki.write.default.receiver]
 }
 

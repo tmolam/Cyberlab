@@ -1,6 +1,12 @@
 services:
   web01:
     image: nginx:latest
+    labels:
+      service: web01
+    logging:
+      driver: json-file
+      options:
+        labels: "service"
     ports:
       - "8080:80"
     volumes:
@@ -12,6 +18,12 @@ services:
 
   app01:
     build: ./app01
+    labels:
+      service: app01
+    logging:
+      driver: json-file
+      options:
+        labels: "service"
     environment:
       DB_HOST: ${DB_HOST}
       DB_USER: ${DB_USER}
@@ -23,6 +35,12 @@ services:
 
   db01:
     image: mariadb:11
+    labels:
+      service: db01
+    logging:
+      driver: json-file
+      options:
+        labels: "service"
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_DATABASE: ${MARIADB_DATABASE}
@@ -35,6 +53,12 @@ services:
 
   attacker01:
     build: ./attacker01
+    labels:
+      service: attacker01
+    logging:
+      driver: json-file
+      options:
+        labels: "service"
     networks:
       - frontend
 
