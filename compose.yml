@@ -20,6 +20,9 @@ services:
     build: ./app01
     cap_drop:
       - ALL
+    read_only: true
+    tmpfs:
+      - \tmp
     labels:
       service: app01
     logging:
