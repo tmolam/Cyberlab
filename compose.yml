@@ -18,6 +18,8 @@ services:
 
   app01:
     build: ./app01
+    cap_drop:
+      - ALL
     labels:
       service: app01
     logging:
