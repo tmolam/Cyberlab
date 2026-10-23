@@ -1,50 +1,141 @@
 # Cyberlab
 
-This is a containerized  cybersecurity lab built with Docker Compose for my own learning purposes.
+A containerized cybersecurity lab built with Docker Compose for hands-on learning about application security, network segmentation, centralized logging, and security detection.
 
-This includes application security, network segmentation, centralized logging and detection.
+## ⚠️ Warning
 
-## WARNING!
-
-This project intentionally contains vulnerable applications and is designed for learning.
-Run only in an isolated environment.
+This project intentionally contains vulnerable application code for educational purposes. Run it only in an isolated, controlled environment. Do not expose vulnerable services to the public internet or use real credentials.
 
 ## Architecture
 
-attacker01 -> web01 (Nginx) -> app01 (Flask) -> db01 (MariaDB)
+```text
+attacker01 → web01 (Nginx) → app01 (Flask) → db01 (MariaDB)
 
-app01 -> Alloy -> Loki -> Grafana
+Application and service logs
+          ↓
+    Grafana Alloy
+          ↓
+      Grafana Loki
+          ↓
+       Grafana
+```
 
 ## Technologies
 
-Docker Compose
+- Docker Compose
+- Nginx reverse proxy
+- Python and Flask
+- MariaDB
+- Grafana Alloy
+- Grafana Loki
+- Grafana
 
-Nginx
+## Services
 
-Python / Flask
-
-MariaDB
-
-Grafana Alloy
-
-Grafana Loki
-
-Grafana
+| Service | Purpose |
+|---|---|
+| `web01` | Nginx reverse proxy and HTTP access logs |
+| `app01` | Flask application and application security exercises |
+| `db01` | MariaDB database |
+| `attacker01` | Lab container for security testing |
+| Alloy | Collects and forwards logs |
+| Loki | Centralized log storage and querying |
+| Grafana | Log exploration and alerting |
 
 ## Security Exercises
 
-SQL injection
+### 1. SQL Injection Detection
 
-Authentication bypass
+The `/login` endpoint intentionally uses unsafe SQL string concatenation for a controlled learning exercise.
 
-Brute-force detection
+- A browser-based login form submits credentials using POST.
+- Suspicious username patterns generate a warning in the application logs.
+- Grafana Loki collects the warning.
+- A Grafana alert detects matching events.
 
-Network segmentation
+Example Loki query:
 
-Logging
+```logql
+{service="app01"} |= "Possible SQL injection attempt"
+```
 
-Alerting
+Example alert query:
 
-## Status
+```logql
+sum(count_over_time({service="app01"} |= "Possible SQL injection attempt" [1m]))
+```
 
-This is an ongoing personal cybersecurity learning project
+The alert is configured to fire when the query result is above zero.
+
+### 2. Failed Login Detection
+
+The application logs failed login attempts, including the username and source address.
+
+Example Loki query:
+
+```logql
+{service="app01"} |= "Failed login"
+```
+
+A Grafana alert was tested using repeated failed login attempts.
+
+### 3. Repeated HTTP 404 Detection
+
+Detects repeated requests for missing web resources through Nginx access logs.
+
+Example Loki query:
+
+```logql
+sum(count_over_time({service="web01"} |= " 404 " [1m]))
+```
+
+The alert threshold is set to detect more than 10 matching responses per minute.
+
+### 4. Suspicious HTTP Request Patterns
+
+Detects requests containing patterns associated with path traversal, SQL injection, or attempts to access environment files.
+
+Example Loki query:
+
+```logql
+sum(count_over_time({service="web01"} |~ "(?i)(\\.\\./|union[[:space:]]+select|/\\.env)" [1m]))
+```
+
+The alert fires when matching requests are detected.
+
+## Logging and Monitoring
+
+The lab uses Grafana Alloy to collect service logs and Grafana Loki to store and query them. Grafana Explore can be used to inspect logs by service label.
+
+Examples:
+
+```logql
+{service="web01"}
+```
+
+```logql
+{service="app01"}
+```
+
+The SQL injection warning can be found with:
+
+```logql
+{service="app01"} |= "Possible SQL injection attempt"
+```
+
+## Network Segmentation and Hardening
+
+The lab is designed to explore separation between application, database, and logging components.
+
+The Flask application container also uses hardening measures such as a non-root user, dropped Linux capabilities, and a read-only root filesystem with a temporary filesystem for `/tmp`.
+
+## Current Status
+
+The following detections have been exercised and verified during testing:
+
+- Failed login detection
+- Repeated HTTP 404 detection
+- Suspicious HTTP request pattern detection
+- SQL injection warning and Grafana alert
+
+This is an ongoing personal cybersecurity learning project. Configuration and detection rules may evolve as additional exercises are added.
