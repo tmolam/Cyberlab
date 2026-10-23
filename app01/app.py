@@ -103,33 +103,76 @@ def safe_user():
 
 	return "<h1>User not found</h1>"
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
-	username = request.args.get("username")
-	password = request.args.get("password")
+    if request.method == "GET":
+        return """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Cyberlab Login</title>
+        </head>
+        <body>
+            <h1>Cyberlab Login</h1>
+            <p>Intentionally vulnerable lab login</p>
+            <form action="/login" method="POST">
+                <p>
+                    <label for="username">Username:</label>
+                    <input id="username" name="username" required>
+                </p>
+                <p>
+                    <label for="password">Password:</label>
+                    <input id="password" name="password"
+                           type="password" required>
+                </p>
+                <button type="submit">Log in</button>
+            </form>
+        </body>
+        </html>
+        """
 
-	logging.info(f"Login attempt for username: {username}")
-	if username and ("' OR " in username.upper() or " OR 1=1" in username.upper()):
-		logging.warning(f"Possible SQL injection attempt: {username}")
-	conn = get_db()
-	cursor = conn.cursor()
+    username = request.form.get("username", "")
+    password = request.form.get("password", "")
 
-	# Intentionally vulnerable lab exercise
-	query = "SELECT id, username FROM users WHERE username = '" + username + "' AND password = '" + password + "'"
-	cursor.execute(query)
+    logging.info("Login attempt for username: %s", username)
 
-	row = cursor.fetchone()
+    if username and (
+        "' OR " in username.upper()
+        or " OR 1=1" in username.upper()
+    ):
+        logging.warning("Possible SQL injection attempt: %s", username)
 
-	cursor.close()
-	conn.close()
+    conn = get_db()
+    cursor = conn.cursor()
 
-	if row:
-		logging.info(f"Succesful login for username: {username}")
-		return f"<h1>Login successful</h1><p>Welcome, {row[1]}!</p>"
+    # Intentionally vulnerable lab exercise only
+    query = (
+        "SELECT id, username FROM users WHERE username = '"
+        + username
+        + "' AND password = '"
+        + password
+        + "'"
+    )
 
-	source_ip = request.headers.get("X-Real-IP", request.remote_addr)
-	logging.warning(f"Failed login for username: {username} from {source_ip}")
-	return "<h1>Login failed</h1>"
+    cursor.execute(query)
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if row:
+        logging.info("Successful login for username: %s", username)
+        return f"<h1>Login successful</h1><p>Welcome, {row[1]}!</p>"
+
+    source_ip = request.headers.get("X-Real-IP", request.remote_addr)
+    logging.warning(
+        "Failed login for username: %s from %s",
+        username,
+        source_ip,
+    )
+    return "<h1>Login failed</h1>"
 
 @app.route("/safe-login")
 def safe_login():
