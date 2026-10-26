@@ -129,6 +129,30 @@ The lab is designed to explore separation between application, database, and log
 
 The Flask application container also uses hardening measures such as a non-root user, dropped Linux capabilities, and a read-only root filesystem with a temporary filesystem for `/tmp`.
 
+## Container Image Vulnerability Scanning
+
+Scanned the cyberlab-app01:latest Docker image using Trivy.
+
+    Scanner: Trivy 0.76.1
+
+    Scan date: 2026-10-26
+
+    Severity checked: HIGH
+
+    Full scan: 44 HIGH findings
+
+    With --ignore-unfixed: 0 HIGH findings
+
+Findings and limitations
+
+The full scan reported HIGH-severity findings, primarily involving operating-system packages in the base image. Trivy did not report HIGH findings with known fixes when --ignore-unfixed was used.
+
+This does not mean the image is vulnerability-free. Findings without a reported fix may still represent security risks. Results reflect the scanner's vulnerability database at the time of the scan.
+Reproduce the scan
+
+sudo trivy image --severity HIGH cyberlab-app01:latest
+sudo trivy image --severity HIGH --ignore-unfixed cyberlab-app01:latest
+
 ## Current Status
 
 The following detections have been exercised and verified during testing:
@@ -137,5 +161,17 @@ The following detections have been exercised and verified during testing:
 - Repeated HTTP 404 detection
 - Suspicious HTTP request pattern detection
 - SQL injection warning and Grafana alert
+
+Container Security
+
+- Configured the app01 container to run as a non-root user.
+
+- Applied container hardening measures, including a read-only root filesystem, dropped Linux capabilities, and a temporary filesystem for /tmp.
+
+- Scanned the cyberlab-app01:latest image using Trivy.
+
+- Identified remaining HIGH-severity vulnerability findings in the container image.
+
+- Confirmed that Trivy reports zero HIGH findings when using --ignore-unfixed; the full scan still reports HIGH findings that require continued monitoring.
 
 This is an ongoing personal cybersecurity learning project. Configuration and detection rules may evolve as additional exercises are added.
