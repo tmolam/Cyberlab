@@ -123,6 +123,35 @@ The SQL injection warning can be found with:
 {service="app01"} |= "Possible SQL injection attempt"
 ```
 
+## Incident Detection and Alert Validation
+
+### Objective
+Validate the failed-login detection pipeline using the Flask application, Grafana Alloy, Loki, and Grafana alerting.
+
+### Investigation Procedure
+1. Generated repeated failed login attempts against the lab application.
+2. Inspected application logs and confirmed that failed-login events were recorded.
+3. Queried Loki to count matching events over a one-minute window.
+4. Observed the Grafana alert enter the Firing state.
+5. Stopped generating test traffic and confirmed that the alert returned to Normal.
+
+### Findings
+- The application logged repeated failed login attempts for the username `alice`.
+- The recorded source address was `172.20.0.1`.
+- Loki returned six matching events in a one-minute window during the investigation.
+- The configured alert threshold was four failed logins.
+- The alert fired during the test and returned to Normal after the triggering condition cleared.
+
+
+### Conclusion
+The test demonstrated that application logging, log collection, Loki queries, and Grafana alerting work together to detect repeated failed login attempts.
+
+This validates the detection pipeline under the tested conditions. It does not establish that a real-world attack occurred.
+
+### Evidence
+Screenshots documenting the failed-login logs, alert firing state, and alert recovery are stored in `docs/screenshots/`.
+
+
 ## Network Segmentation and Hardening
 
 The lab is designed to explore separation between application, database, and logging components.
