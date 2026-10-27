@@ -148,8 +148,26 @@ The test demonstrated that application logging, log collection, Loki queries, an
 
 This validates the detection pipeline under the tested conditions. It does not establish that a real-world attack occurred.
 
-### Evidence
-Screenshots documenting the failed-login logs, alert firing state, and alert recovery are stored in `docs/screenshots/`.
+### Investigation Evidence
+
+#### 1. Failed Login Events
+
+Application logs showing repeated failed login attempts.
+
+![Failed login logs](docs/screenshots/failed-login-logs.png)
+
+#### 2. Alert Triggered
+
+Grafana alert in the Firing state during the controlled test.
+
+![Alert firing](docs/screenshots/alert-firing.png)
+
+#### 3. Alert Recovery
+
+Grafana alert returning to Normal after test traffic stopped.
+
+![Alert recovered](docs/screenshots/alert-recovered.png)
+
 
 
 ## Network Segmentation and Hardening
