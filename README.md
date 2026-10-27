@@ -148,10 +148,16 @@ Findings and limitations
 The full scan reported HIGH-severity findings, primarily involving operating-system packages in the base image. Trivy did not report HIGH findings with known fixes when --ignore-unfixed was used.
 
 This does not mean the image is vulnerability-free. Findings without a reported fix may still represent security risks. Results reflect the scanner's vulnerability database at the time of the scan.
-Reproduce the scan
 
-sudo trivy image --severity HIGH cyberlab-app01:latest
-sudo trivy image --severity HIGH --ignore-unfixed cyberlab-app01:latest
+### Automated Security Scanning
+
+- Integrated Trivy image vulnerability scanning into GitHub Actions.
+- The workflow builds the `app01` image and scans for HIGH and CRITICAL vulnerabilities on pushes and pull requests.
+- The initial automated scan reported 44 HIGH-severity findings.
+- Findings are reported in the workflow logs without failing the build solely because vulnerabilities are detected.
+- Vulnerability remediation and review of remaining findings are ongoing.
+
+The scan results represent the image built during the workflow run. A successful workflow indicates that the configured build and scan steps completed; it does not mean the image is vulnerability-free.
 
 ## Current Status
 
